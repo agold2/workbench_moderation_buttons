@@ -17,22 +17,31 @@ function workbench_moderation_buttons_form_node_form_alter(&$form, $form_state, 
     for($i=0,$length=count($stateMachineNames); $i<$length; $i++) {
       $machineName = $stateMachineNames[$i];
       $label = t($states[$machineName]->description);
-      $actions[$machineName] = array(
-        '#access' => 1,
-        '#attributes' => array(
-          'data-value' => $machineName
-        ),
-        '#submit' => $actions['submit']['#submit'],
-        '#type' => 'submit',
-        '#value' => $label,
-        '#weight' => 11+$i // 10's the weight for preview button.
-      );
-      $labelMachineNames[$label] = $machineName;
-    }
+      if (($form['type']['#value'] == 'partner_organization') && ($machineName == 'published')) {
+        $label = 'Publish';
+      }
 
-    $form['#validate'][] = 'workbench_moderation_buttons_node_form_validate';
-    $form['#workbench_moderation_buttons_list'] = $labelMachineNames;
-    unset($actions['submit']); // Remove original submit button.
+      if (($form['type']['#value'] == 'partner_organization') && ($machineName == 'draft')) {
+        $label = '';
+      }
+      if ($label) {
+        $actions[$machineName] = array(
+          '#access' => 1,
+          '#attributes' => array(
+            'data-value' => $machineName
+          ),
+          '#submit' => $actions['submit']['#submit'],
+          '#type' => 'submit',
+          '#value' => $label,
+          '#weight' => 11+$i // 10's the weight for preview button.
+        );
+        $labelMachineNames[$label] = $machineName;
+      }
+
+      $form['#validate'][] = 'workbench_moderation_buttons_node_form_validate';
+      $form['#workbench_moderation_buttons_list'] = $labelMachineNames;
+      unset($actions['submit']); // Remove original submit button.
+    }
   }
 }
 
